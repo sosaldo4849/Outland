@@ -386,7 +386,7 @@
           </div>
           <div class="title-block">
             <div class="title">Outland</div>
-            <div class="subtitle">10 школа м. Торецьк</div>
+            <div class="subtitle">9-В</div>
           </div>
         </div>
 
@@ -535,29 +535,28 @@
       }
 
       function buildWeekSchedule() {
+        const fixedPlan = [
+          ['Українська мова', 'Алгебра', 'Фізика', 'Українська література', 'Інформатика', 'Біологія', 'Англійська мова', 'Історія України'],
+          ['Геометрія', 'Українська мова', 'Хімія', 'Зарубіжна література', 'Фізика', 'Англійська мова', 'Біологія', 'Інформатика'],
+          ['Фізика', 'Українська література', 'Алгебра', 'Геометрія', 'Історія України', 'Англійська мова', 'Хімія', 'Інформатика'],
+          ['Українська мова', 'Біологія', 'Геометрія', 'Фізика', 'Англійська мова', 'Історія Всесвітня', 'Інформатика', 'Українська література'],
+          ['Алгебра', 'Геометрія', 'Хімія', 'Історія України', 'Фізика', 'Біологія', 'Англійська мова', 'Українська мова']
+        ];
+
         const newSchedule = {};
 
         dayNames.forEach((day, dayIndex) => {
-          const basePool = shuffleArray(allSubjects);
-          const chosen = [];
+          const dayLessons = fixedPlan[dayIndex] || fixedPlan[0];
 
-          if (dayIndex % 2 === 0) {
-            chosen.push(...basePool.filter((subject) => ['Алгебра', 'Фізика', 'Українська мова', 'Інформатика', 'Біологія'].includes(subject.name)).slice(0, 2));
-          }
-
-          const extra = basePool.filter((subject) => !chosen.some((item) => item.name === subject.name));
-          const picked = [...chosen, ...extra].slice(0, 8);
-
-          while (picked.length < 8) {
-            picked.push(basePool[picked.length % basePool.length]);
-          }
-
-          newSchedule[day] = picked.slice(0, 8).map((subject, index) => ({
-            number: index + 1,
-            time: timeSlots[index],
-            subject: subject.name,
-            link: subject.link
-          }));
+          newSchedule[day] = dayLessons.map((subjectName, index) => {
+            const subject = allSubjects.find((item) => item.name === subjectName) || allSubjects[0];
+            return {
+              number: index + 1,
+              time: timeSlots[index],
+              subject: subjectName,
+              link: subject.link
+            };
+          });
         });
 
         return newSchedule;
