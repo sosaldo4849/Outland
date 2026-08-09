@@ -322,6 +322,126 @@
         font-weight: 900;
       }
 
+      .secret-popup {
+        position: fixed;
+        inset: 0;
+        display: grid;
+        place-items: center;
+        background: rgba(0, 0, 0, 0.55);
+        z-index: 1000;
+        padding: 20px;
+      }
+
+      .secret-box {
+        width: min(520px, 100%);
+        background: #fff;
+        border: 3px solid var(--dark);
+        border-radius: 22px;
+        box-shadow: 0 18px 50px rgba(0, 0, 0, 0.18);
+        padding: 24px;
+      }
+
+      .secret-title {
+        margin: 0 0 16px;
+        font-size: 1.4rem;
+        letter-spacing: 0.04em;
+      }
+
+      .secret-input {
+        width: 100%;
+        border: 2px solid var(--dark);
+        border-radius: 14px;
+        font-size: 1rem;
+        padding: 14px 16px;
+        margin-bottom: 16px;
+      }
+
+      .secret-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 12px;
+      }
+
+      .admin-panel {
+        position: fixed;
+        right: 20px;
+        top: 80px;
+        width: min(420px, calc(100% - 40px));
+        max-height: calc(100vh - 120px);
+        overflow: auto;
+        background: #fff;
+        border: 3px solid var(--dark);
+        border-radius: 24px;
+        box-shadow: 0 18px 50px rgba(0, 0, 0, 0.18);
+        padding: 20px;
+        z-index: 900;
+      }
+
+      .admin-panel.hidden,
+      .secret-popup.hidden {
+        display: none !important;
+      }
+
+      .admin-panel-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        margin-bottom: 18px;
+      }
+
+      .admin-grid {
+        display: grid;
+        gap: 14px;
+      }
+
+      .admin-grid label {
+        display: grid;
+        gap: 10px;
+        font-weight: 700;
+        text-transform: uppercase;
+        font-size: 0.85rem;
+      }
+
+      .admin-grid input,
+      .admin-grid textarea {
+        width: 100%;
+        border: 2px solid var(--dark);
+        border-radius: 14px;
+        padding: 14px 16px;
+        font-size: 0.95rem;
+      }
+
+      .admin-grid textarea {
+        resize: vertical;
+        min-height: 220px;
+      }
+
+      .admin-actions {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+        margin-top: 14px;
+      }
+
+      .device-list {
+        margin: 0;
+        padding: 0;
+        list-style: none;
+        display: grid;
+        gap: 10px;
+        margin-top: 16px;
+      }
+
+      .device-list li {
+        padding: 12px 14px;
+        background: #f6f0b4;
+        border: 2px solid var(--dark);
+        border-radius: 14px;
+        font-size: 0.95rem;
+        font-weight: 700;
+      }
+
       .footer-note {
         display: flex;
         align-items: center;
@@ -445,11 +565,144 @@
       </div>
     </div>
 
-    <script>
+    <div id="secretPopup" class="secret-popup hidden" aria-hidden="true">
+      <div class="secret-box">
+        <h2 class="secret-title">Секретна команда</h2>
+        <input id="secretInput" class="secret-input" type="text" placeholder="inject command" autocomplete="off" />
+        <div class="secret-actions">
+          <button class="ghost-btn" id="secretCancel" type="button">Закрити</button>
+          <button class="primary-btn" id="secretSubmit" type="button">Ввести</button>
+        </div>
+      </div>
+    </div>
+
+    <aside id="adminPanel" class="admin-panel hidden" aria-label="Адмін-панель">
+      <div class="admin-panel-header">
+        <h3>Адмін-панель</h3>
+        <button class="ghost-btn" id="closeAdminPanel" type="button">Вихід</button>
+      </div>
+      <div class="admin-grid">
+        <label>
+          Назва сайту
+          <input id="adminTitleInput" type="text" />
+        </label>
+        <label>
+          Підзаголовок
+          <input id="adminSubtitleInput" type="text" />
+        </label>
+        <label class="full-width">
+          Розклад JSON
+          <textarea id="adminScheduleInput" rows="14"></textarea>
+        </label>
+      </div>
+      <div class="admin-actions">
+        <button class="primary-btn" id="saveAdminData" type="button">Зберегти</button>
+        <button class="danger-btn" id="resetAdminData" type="button">Скинути на стандарт</button>
+      </div>
+      <h4>Пристрої онлайн</h4>
+      <ul id="deviceList" class="device-list"></ul>
+    </aside>
+
+    <script type="module">
+      import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
+      import {
+        getDatabase,
+        ref,
+        get,
+        set,
+        onValue,
+        remove,
+        onDisconnect
+      } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js';
+
+      const firebaseConfig = {
+        apiKey: 'AIzaSyCUN4coxW6yb7MwoTkbDDHa3URIDGDWuw8',
+        authDomain: 'math-project-8195b.firebaseapp.com',
+        databaseURL: 'https://math-project-8195b-default-rtdb.europe-west1.firebasedatabase.app',
+        projectId: 'math-project-8195b',
+        storageBucket: 'math-project-8195b.appspot.com',
+        messagingSenderId: '947622423521',
+        appId: '1:947622423521:web:3038ae8b6be7d8c9f740a0',
+        measurementId: 'G-J8JX4XPGHS'
+      };
+
+      const app = initializeApp(firebaseConfig);
+      const db = getDatabase(app);
+
       const tabs = document.querySelectorAll('.tab');
       const panels = document.querySelectorAll('.panel');
       const dayNames = ['Понеділок', 'Вівторок', 'Середа', 'Четвер', "П'ятниця"];
       const meetWebLink = 'https://meet.google.com/hjj-irbi-bfv?authuser=0';
+      const lessonDuration = 30;
+      const STORAGE_KEYS = {
+        selectedDay: 'outland.selectedDay',
+        adminMode: 'outland.adminMode'
+      };
+
+      const defaultSchedule = {
+        'Понеділок': [
+          { number: 1, time: '8:30', subject: 'Українська мова' },
+          { number: 2, time: '9:10', subject: 'Алгебра' },
+          { number: 3, time: '9:50', subject: 'Фізика' },
+          { number: 4, time: '10:30', subject: 'Українська література' },
+          { number: 5, time: '11:10', subject: 'Інформатика' },
+          { number: 6, time: '11:50', subject: 'Біологія' },
+          { number: 7, time: '12:30', subject: 'Англійська мова' },
+          { number: 8, time: '13:10', subject: 'Історія України' }
+        ],
+        'Вівторок': [
+          { number: 1, time: '8:30', subject: 'Геометрія' },
+          { number: 2, time: '9:10', subject: 'Українська мова' },
+          { number: 3, time: '9:50', subject: 'Хімія' },
+          { number: 4, time: '10:30', subject: 'Зарубіжна література' },
+          { number: 5, time: '11:10', subject: 'Фізика' },
+          { number: 6, time: '11:50', subject: 'Англійська мова' },
+          { number: 7, time: '12:30', subject: 'Біологія' },
+          { number: 8, time: '13:10', subject: 'Інформатика' }
+        ],
+        'Середа': [
+          { number: 1, time: '8:30', subject: 'Фізика' },
+          { number: 2, time: '9:10', subject: 'Українська література' },
+          { number: 3, time: '9:50', subject: 'Алгебра' },
+          { number: 4, time: '10:30', subject: 'Геометрія' },
+          { number: 5, time: '11:10', subject: 'Історія України' },
+          { number: 6, time: '11:50', subject: 'Англійська мова' },
+          { number: 7, time: '12:30', subject: 'Хімія' },
+          { number: 8, time: '13:10', subject: 'Інформатика' }
+        ],
+        'Четвер': [
+          { number: 1, time: '8:30', subject: 'Українська мова' },
+          { number: 2, time: '9:10', subject: 'Біологія' },
+          { number: 3, time: '9:50', subject: 'Геометрія' },
+          { number: 4, time: '10:30', subject: 'Фізика' },
+          { number: 5, time: '11:10', subject: 'Англійська мова' },
+          { number: 6, time: '11:50', subject: 'Історія Всесвітня' },
+          { number: 7, time: '12:30', subject: 'Інформатика' },
+          { number: 8, time: '13:10', subject: 'Українська література' }
+        ],
+        "П'ятниця": [
+          { number: 1, time: '8:30', subject: 'Алгебра' },
+          { number: 2, time: '9:10', subject: 'Геометрія' },
+          { number: 3, time: '9:50', subject: 'Хімія' },
+          { number: 4, time: '10:30', subject: 'Історія України' },
+          { number: 5, time: '11:10', subject: 'Фізика' },
+          { number: 6, time: '11:50', subject: 'Біологія' },
+          { number: 7, time: '12:30', subject: 'Англійська мова' },
+          { number: 8, time: '13:10', subject: 'Українська мова' }
+        ]
+      };
+
+      let selectedDay = 'Понеділок';
+      let isAdmin = localStorage.getItem(STORAGE_KEYS.adminMode) === '1';
+      let siteState = {
+        pageTitle: 'Outland',
+        subtitle: '10 школа м. Торецьк',
+        schedule: JSON.parse(JSON.stringify(defaultSchedule))
+      };
+
+      function clone(value) {
+        return JSON.parse(JSON.stringify(value));
+      }
 
       function openMeet(code = 'hjj-irbi-bfv') {
         const url = `https://meet.google.com/${code}?authuser=0`;
@@ -465,38 +718,6 @@
 
         window.open(url, '_blank', 'noopener,noreferrer');
       }
-
-      const allSubjects = [
-        { name: 'Українська мова', link: meetWebLink },
-        { name: 'Українська література', link: meetWebLink },
-        { name: 'Фізика', link: meetWebLink },
-        { name: 'Алгебра', link: meetWebLink },
-        { name: 'Геометрія', link: meetWebLink },
-        { name: 'Зарубіжна література', link: meetWebLink },
-        { name: 'Хімія', link: meetWebLink },
-        { name: 'Біологія', link: meetWebLink },
-        { name: 'Історія України', link: meetWebLink },
-        { name: 'Історія Всесвітня', link: meetWebLink },
-        { name: 'ОБЖ', link: meetWebLink },
-        { name: 'Німецька мова', link: meetWebLink },
-        { name: 'Англійська мова', link: meetWebLink },
-        { name: 'Громадянська освіта', link: meetWebLink },
-        { name: 'Образотворче мистецтво', link: meetWebLink },
-        { name: 'Музичне мистецтво', link: meetWebLink },
-        { name: 'Праця', link: meetWebLink },
-        { name: 'Інформатика', link: meetWebLink },
-        { name: 'Фінансова грамотність', link: meetWebLink }
-      ];
-
-      const lessonDuration = 30;
-      const breakDuration = 10;
-      const timeSlots = ['8:30', '9:10', '9:50', '10:30', '11:10', '11:50', '12:30', '13:10'];
-      const STORAGE_KEYS = {
-        selectedDay: 'outland.selectedDay',
-        schedule: 'outland.weekSchedule'
-      };
-      let selectedDay = 'Понеділок';
-      let weekSchedule = {};
 
       function getKyivParts() {
         const formatter = new Intl.DateTimeFormat('en-GB', {
@@ -538,86 +759,20 @@
         return hour * 60 + minute;
       }
 
-      function getCurrentWeekKey() {
-        const now = new Date();
-        const kyivNow = new Date(now.toLocaleString('en-US', { timeZone: 'Europe/Kyiv' }));
-        const start = new Date(Date.UTC(kyivNow.getFullYear(), 0, 4));
-        const day = (kyivNow.getUTCDay() + 6) % 7;
-        const monday = new Date(Date.UTC(kyivNow.getFullYear(), kyivNow.getUTCMonth(), kyivNow.getUTCDate() - day));
-        const diff = Math.floor((monday - start) / 86400000);
-        const weekNumber = Math.floor(diff / 7) + 1;
-        return `${kyivNow.getUTCFullYear()}-${weekNumber}`;
+      function isWeekendNow() {
+        return !dayNames.includes(getCurrentKyivDayName());
       }
 
-      const fixedWeekSchedule = {
-        'Понеділок': [
-          { number: 1, time: '8:30', subject: 'Українська мова', link: 'https://meet.google.com/hjj-irbi-bfv?authuser=0' },
-          { number: 2, time: '9:10', subject: 'Алгебра', link: 'https://meet.google.com/hjj-irbi-bfv?authuser=0' },
-          { number: 3, time: '9:50', subject: 'Фізика', link: 'https://meet.google.com/hjj-irbi-bfv?authuser=0' },
-          { number: 4, time: '10:30', subject: 'Українська література', link: 'https://meet.google.com/hjj-irbi-bfv?authuser=0' },
-          { number: 5, time: '11:10', subject: 'Інформатика', link: 'https://meet.google.com/hjj-irbi-bfv?authuser=0' },
-          { number: 6, time: '11:50', subject: 'Біологія', link: 'https://meet.google.com/hjj-irbi-bfv?authuser=0' },
-          { number: 7, time: '12:30', subject: 'Англійська мова', link: 'https://meet.google.com/hjj-irbi-bfv?authuser=0' },
-          { number: 8, time: '13:10', subject: 'Історія України', link: 'https://meet.google.com/hjj-irbi-bfv?authuser=0' }
-        ],
-        'Вівторок': [
-          { number: 1, time: '8:30', subject: 'Геометрія', link: 'https://meet.google.com/hjj-irbi-bfv?authuser=0' },
-          { number: 2, time: '9:10', subject: 'Українська мова', link: 'https://meet.google.com/hjj-irbi-bfv?authuser=0' },
-          { number: 3, time: '9:50', subject: 'Хімія', link: 'https://meet.google.com/hjj-irbi-bfv?authuser=0' },
-          { number: 4, time: '10:30', subject: 'Зарубіжна література', link: 'https://meet.google.com/hjj-irbi-bfv?authuser=0' },
-          { number: 5, time: '11:10', subject: 'Фізика', link: 'https://meet.google.com/hjj-irbi-bfv?authuser=0' },
-          { number: 6, time: '11:50', subject: 'Англійська мова', link: 'https://meet.google.com/hjj-irbi-bfv?authuser=0' },
-          { number: 7, time: '12:30', subject: 'Біологія', link: 'https://meet.google.com/hjj-irbi-bfv?authuser=0' },
-          { number: 8, time: '13:10', subject: 'Інформатика', link: 'https://meet.google.com/hjj-irbi-bfv?authuser=0' }
-        ],
-        'Середа': [
-          { number: 1, time: '8:30', subject: 'Фізика', link: 'https://meet.google.com/hjj-irbi-bfv?authuser=0' },
-          { number: 2, time: '9:10', subject: 'Українська література', link: 'https://meet.google.com/hjj-irbi-bfv?authuser=0' },
-          { number: 3, time: '9:50', subject: 'Алгебра', link: 'https://meet.google.com/hjj-irbi-bfv?authuser=0' },
-          { number: 4, time: '10:30', subject: 'Геометрія', link: 'https://meet.google.com/hjj-irbi-bfv?authuser=0' },
-          { number: 5, time: '11:10', subject: 'Історія України', link: 'https://meet.google.com/hjj-irbi-bfv?authuser=0' },
-          { number: 6, time: '11:50', subject: 'Англійська мова', link: 'https://meet.google.com/hjj-irbi-bfv?authuser=0' },
-          { number: 7, time: '12:30', subject: 'Хімія', link: 'https://meet.google.com/hjj-irbi-bfv?authuser=0' },
-          { number: 8, time: '13:10', subject: 'Інформатика', link: 'https://meet.google.com/hjj-irbi-bfv?authuser=0' }
-        ],
-        'Четвер': [
-          { number: 1, time: '8:30', subject: 'Українська мова', link: 'https://meet.google.com/hjj-irbi-bfv?authuser=0' },
-          { number: 2, time: '9:10', subject: 'Біологія', link: 'https://meet.google.com/hjj-irbi-bfv?authuser=0' },
-          { number: 3, time: '9:50', subject: 'Геометрія', link: 'https://meet.google.com/hjj-irbi-bfv?authuser=0' },
-          { number: 4, time: '10:30', subject: 'Фізика', link: 'https://meet.google.com/hjj-irbi-bfv?authuser=0' },
-          { number: 5, time: '11:10', subject: 'Англійська мова', link: 'https://meet.google.com/hjj-irbi-bfv?authuser=0' },
-          { number: 6, time: '11:50', subject: 'Історія Всесвітня', link: 'https://meet.google.com/hjj-irbi-bfv?authuser=0' },
-          { number: 7, time: '12:30', subject: 'Інформатика', link: 'https://meet.google.com/hjj-irbi-bfv?authuser=0' },
-          { number: 8, time: '13:10', subject: 'Українська література', link: 'https://meet.google.com/hjj-irbi-bfv?authuser=0' }
-        ],
-        "П'ятниця": [
-          { number: 1, time: '8:30', subject: 'Алгебра', link: 'https://meet.google.com/hjj-irbi-bfv?authuser=0' },
-          { number: 2, time: '9:10', subject: 'Геометрія', link: 'https://meet.google.com/hjj-irbi-bfv?authuser=0' },
-          { number: 3, time: '9:50', subject: 'Хімія', link: 'https://meet.google.com/hjj-irbi-bfv?authuser=0' },
-          { number: 4, time: '10:30', subject: 'Історія України', link: 'https://meet.google.com/hjj-irbi-bfv?authuser=0' },
-          { number: 5, time: '11:10', subject: 'Фізика', link: 'https://meet.google.com/hjj-irbi-bfv?authuser=0' },
-          { number: 6, time: '11:50', subject: 'Біологія', link: 'https://meet.google.com/hjj-irbi-bfv?authuser=0' },
-          { number: 7, time: '12:30', subject: 'Англійська мова', link: 'https://meet.google.com/hjj-irbi-bfv?authuser=0' },
-          { number: 8, time: '13:10', subject: 'Українська мова', link: 'https://meet.google.com/hjj-irbi-bfv?authuser=0' }
-        ]
-      };
-
-      function buildWeekSchedule() {
-        const newSchedule = {};
-
-        dayNames.forEach((day) => {
-          newSchedule[day] = (fixedWeekSchedule[day] || fixedWeekSchedule['Понеділок']).map((lesson) => ({
-            ...lesson
-          }));
-        });
-
-        return newSchedule;
+      function getTimeMinutes(value) {
+        const [hours, minutes] = value.split(':').map(Number);
+        return hours * 60 + minutes;
       }
 
-      function ensureWeekSchedule() {
-        const fixedSchedule = buildWeekSchedule();
-        weekSchedule = fixedSchedule;
-        localStorage.setItem(STORAGE_KEYS.schedule, JSON.stringify(fixedSchedule));
+      function formatEndTime(startTime) {
+        const endMinutes = getTimeMinutes(startTime) + lessonDuration;
+        const hours = Math.floor(endMinutes / 60);
+        const minutes = endMinutes % 60;
+        return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
       }
 
       function saveSelectedDay() {
@@ -631,18 +786,42 @@
         }
       }
 
-      function getTimeMinutes(value) {
-        const [hours, minutes] = value.split(':').map(Number);
-        return hours * 60 + minutes;
+      function updateAdminUI() {
+        document.getElementById('adminPanel').classList.toggle('hidden', !isAdmin);
       }
 
-      function getLessonEndTime(startTime) {
-        return getTimeMinutes(startTime) + lessonDuration;
+      function showSecretPopup() {
+        document.getElementById('secretPopup').classList.remove('hidden');
+        document.getElementById('secretInput').value = '';
+        setTimeout(() => document.getElementById('secretInput').focus(), 50);
       }
 
-      function isWeekendNow() {
-        const todayName = getCurrentKyivDayName();
-        return !dayNames.includes(todayName);
+      function hideSecretPopup() {
+        document.getElementById('secretPopup').classList.add('hidden');
+      }
+
+      function activateAdminMode() {
+        isAdmin = true;
+        localStorage.setItem(STORAGE_KEYS.adminMode, '1');
+        updateAdminUI();
+        hideSecretPopup();
+      }
+
+      function deactivateAdminMode() {
+        isAdmin = false;
+        localStorage.setItem(STORAGE_KEYS.adminMode, '0');
+        updateAdminUI();
+      }
+
+      function handleSecretCommand(command) {
+        const normalized = String(command || '').trim().toLowerCase();
+        if (normalized === 'auth\\yono' || normalized === 'auth/yono') {
+          activateAdminMode();
+          return;
+        }
+        if (normalized.length) {
+          alert('Невірна команда. Введіть auth\\yono');
+        }
       }
 
       function renderDayButtons() {
@@ -664,10 +843,7 @@
           btn.addEventListener('click', () => {
             selectedDay = day;
             saveSelectedDay();
-            renderDayButtons();
-            renderSubjects();
-            renderSchedule();
-            updateTodayCard();
+            refreshViews();
           });
           daySwitcher.appendChild(btn);
         });
@@ -680,16 +856,14 @@
           return;
         }
 
-        const currentDayLessons = weekSchedule[selectedDay] || [];
+        const lessons = siteState.schedule[selectedDay] || [];
         const nowMinutes = getKyivMinutesNow();
-
         subjectGrid.innerHTML = '';
 
-        currentDayLessons.forEach((lesson) => {
-          const startMinutes = getTimeMinutes(lesson.time);
-          const endMinutes = getLessonEndTime(lesson.time);
+        lessons.forEach((lesson) => {
+          const endMinutes = getTimeMinutes(lesson.time) + lessonDuration;
           const link = document.createElement('a');
-          link.href = lesson.link || meetWebLink;
+          link.href = meetWebLink;
           link.target = '_blank';
           link.rel = 'noopener noreferrer';
           link.className = 'subject-btn';
@@ -718,13 +892,14 @@
       function renderSchedule() {
         const scheduleBody = document.getElementById('scheduleBody');
         const scheduleTitle = document.getElementById('scheduleTitle');
+
         if (isWeekendNow()) {
           scheduleTitle.textContent = 'Розклад';
           scheduleBody.innerHTML = '';
           return;
         }
 
-        const lessons = weekSchedule[selectedDay] || [];
+        const lessons = siteState.schedule[selectedDay] || [];
         scheduleTitle.textContent = `Розклад · ${selectedDay}`;
         scheduleBody.innerHTML = '';
 
@@ -739,14 +914,6 @@
         });
       }
 
-      function formatEndTime(startTime) {
-        const startMinutes = getTimeMinutes(startTime);
-        const endMinutes = startMinutes + lessonDuration;
-        const hours = Math.floor(endMinutes / 60);
-        const minutes = endMinutes % 60;
-        return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
-      }
-
       function updateTodayCard() {
         const todayLabel = document.getElementById('todayLabel');
         const nextLessonLabel = document.getElementById('nextLessonLabel');
@@ -759,77 +926,199 @@
         }
 
         todayLabel.textContent = todayName;
-
-        const targetDay = selectedDay || todayName;
-        const targetLessons = weekSchedule[targetDay] || weekSchedule['Понеділок'];
+        const lessons = siteState.schedule[selectedDay] || [];
         const nowMinutes = getKyivMinutesNow();
 
-        const activeLesson = targetLessons.find((lesson) => {
+        const activeLesson = lessons.find((lesson) => {
           const start = getTimeMinutes(lesson.time);
-          const end = getLessonEndTime(lesson.time);
+          const end = start + lessonDuration;
           return start <= nowMinutes && nowMinutes < end;
         });
 
         if (activeLesson) {
-          const endTime = formatEndTime(activeLesson.time);
-          nextLessonLabel.textContent = `🕒 ${activeLesson.subject} ${activeLesson.time} - ${endTime}`;
+          nextLessonLabel.textContent = `🕒 ${activeLesson.subject} ${activeLesson.time} - ${formatEndTime(activeLesson.time)}`;
           return;
         }
 
-        for (let i = 0; i < targetLessons.length; i++) {
-          const lesson = targetLessons[i];
-          const lessonEnd = getLessonEndTime(lesson.time);
-          const hasNext = i + 1 < targetLessons.length;
-          const nextStart = hasNext ? getTimeMinutes(targetLessons[i + 1].time) : null;
-
-          if (nowMinutes >= lessonEnd && nextStart !== null && nowMinutes < nextStart) {
-            nextLessonLabel.textContent = '☕ Перерва';
-            return;
-          }
-        }
-
-        const lastLesson = targetLessons[targetLessons.length - 1];
-        const lastLessonEnd = lastLesson ? getLessonEndTime(lastLesson.time) : 0;
-
-        if (lastLessonEnd <= nowMinutes || nowMinutes < getTimeMinutes(targetLessons[0].time)) {
-          nextLessonLabel.textContent = '✕ Немає уроків';
+        const nextLesson = lessons.find((lesson) => nowMinutes < getTimeMinutes(lesson.time));
+        if (nextLesson) {
+          nextLessonLabel.textContent = `🕒 ${nextLesson.subject} ${nextLesson.time}`;
           return;
         }
 
-        const nextLesson = targetLessons.find((lesson) => nowMinutes < getTimeMinutes(lesson.time));
-        nextLessonLabel.textContent = nextLesson
-          ? `🕒 ${nextLesson.subject} ${nextLesson.time}`
-          : '✕ Немає уроків';
+        nextLessonLabel.textContent = '✕ Немає уроків';
       }
 
-      function refreshUI() {
-        const todayName = getCurrentKyivDayName();
-
-        if (!dayNames.includes(selectedDay)) {
-          selectedDay = dayNames.includes(todayName) ? todayName : 'Понеділок';
-        }
-
+      function refreshViews() {
         saveSelectedDay();
+        document.querySelector('.title').textContent = siteState.pageTitle;
+        document.querySelector('.subtitle').textContent = siteState.subtitle;
+        document.title = siteState.pageTitle;
         renderDayButtons();
         renderSubjects();
         renderSchedule();
         updateTodayCard();
       }
 
-      tabs.forEach((tab) => {
-        tab.addEventListener('click', () => {
-          const target = tab.dataset.target;
-          tabs.forEach((item) => item.classList.toggle('active', item === tab));
-          panels.forEach((panel) => {
-            panel.classList.toggle('active', panel.id === target);
+      function fillAdminForm() {
+        document.getElementById('adminTitleInput').value = siteState.pageTitle;
+        document.getElementById('adminSubtitleInput').value = siteState.subtitle;
+        document.getElementById('adminScheduleInput').value = JSON.stringify(siteState.schedule, null, 2);
+      }
+
+      async function saveAdminChanges() {
+        let schedule;
+        try {
+          schedule = JSON.parse(document.getElementById('adminScheduleInput').value);
+        } catch (error) {
+          alert('Невірний JSON. Перевірте розклад.');
+          return;
+        }
+
+        const nextState = {
+          pageTitle: document.getElementById('adminTitleInput').value.trim() || 'Outland',
+          subtitle: document.getElementById('adminSubtitleInput').value.trim() || '10 школа м. Торецьк',
+          schedule,
+          updatedAt: Date.now()
+        };
+
+        siteState = nextState;
+        await set(ref(db, 'site/content'), nextState);
+      }
+
+      async function resetAdminChanges() {
+        siteState = {
+          pageTitle: 'Outland',
+          subtitle: '10 школа м. Торецьк',
+          schedule: clone(defaultSchedule),
+          updatedAt: Date.now()
+        };
+        await set(ref(db, 'site/content'), siteState);
+      }
+
+      function updateDeviceList(devices) {
+        const list = document.getElementById('deviceList');
+        list.innerHTML = '';
+
+        if (!devices || !Object.keys(devices).length) {
+          list.innerHTML = '<li>Немає активних пристроїв</li>';
+          return;
+        }
+
+        const activeDevices = Object.values(devices)
+          .filter((device) => device && device.lastSeen && Date.now() - device.lastSeen < 45000)
+          .sort((a, b) => b.lastSeen - a.lastSeen);
+
+        if (!activeDevices.length) {
+          list.innerHTML = '<li>Немає активних пристроїв</li>';
+          return;
+        }
+
+        activeDevices.forEach((device) => {
+          const item = document.createElement('li');
+          const label = device.label || device.userAgent || 'браузер';
+          const time = new Date(device.lastSeen).toLocaleTimeString('uk-UA', { hour: '2-digit', minute: '2-digit' });
+          item.textContent = `${label} • ${time}`;
+          list.appendChild(item);
+        });
+      }
+
+      function startPresence() {
+        const clientId = crypto.randomUUID ? crypto.randomUUID() : `device-${Date.now()}-${Math.random().toString(16).slice(2)}`;
+        const presenceRef = ref(db, `presence/${clientId}`);
+        const payload = {
+          label: navigator.platform || 'browser',
+          userAgent: navigator.userAgent,
+          lastSeen: Date.now()
+        };
+
+        set(presenceRef, payload);
+        onDisconnect(presenceRef).remove();
+
+        const heartbeat = setInterval(() => {
+          set(presenceRef, { ...payload, lastSeen: Date.now() });
+        }, 20000);
+
+        window.addEventListener('beforeunload', () => {
+          clearInterval(heartbeat);
+          remove(presenceRef);
+        });
+      }
+
+      function bindEvents() {
+        tabs.forEach((tab) => {
+          tab.addEventListener('click', () => {
+            const target = tab.dataset.target;
+            tabs.forEach((item) => item.classList.toggle('active', item === tab));
+            panels.forEach((panel) => panel.classList.toggle('active', panel.id === target));
           });
         });
-      });
+
+        document.getElementById('secretCancel').addEventListener('click', hideSecretPopup);
+        document.getElementById('secretSubmit').addEventListener('click', () => {
+          handleSecretCommand(document.getElementById('secretInput').value);
+        });
+        document.getElementById('secretInput').addEventListener('keydown', (event) => {
+          if (event.key === 'Enter') handleSecretCommand(event.target.value);
+        });
+
+        document.getElementById('closeAdminPanel').addEventListener('click', deactivateAdminMode);
+        document.getElementById('saveAdminData').addEventListener('click', saveAdminChanges);
+        document.getElementById('resetAdminData').addEventListener('click', resetAdminChanges);
+
+        document.addEventListener('keydown', (event) => {
+          if (event.key === 'ё' || event.key === '`' || event.key === '~') {
+            event.preventDefault();
+            showSecretPopup();
+          }
+        });
+      }
+
+      async function initDatabase() {
+        try {
+          const contentRef = ref(db, 'site/content');
+          const snapshot = await get(contentRef);
+
+          if (snapshot.exists()) {
+            const data = snapshot.val();
+            siteState = {
+              pageTitle: data.pageTitle || 'Outland',
+              subtitle: data.subtitle || '10 школа м. Торецьк',
+              schedule: data.schedule && Object.keys(data.schedule).length ? data.schedule : clone(defaultSchedule)
+            };
+          } else {
+            await set(contentRef, siteState);
+          }
+
+          onValue(contentRef, (snapshotValue) => {
+            if (!snapshotValue.exists()) return;
+            const data = snapshotValue.val();
+            siteState = {
+              pageTitle: data.pageTitle || 'Outland',
+              subtitle: data.subtitle || '10 школа м. Торецьк',
+              schedule: data.schedule && Object.keys(data.schedule).length ? data.schedule : clone(defaultSchedule)
+            };
+            fillAdminForm();
+            refreshViews();
+          });
+
+          const presenceRef = ref(db, 'presence');
+          onValue(presenceRef, (snapshotValue) => {
+            updateDeviceList(snapshotValue.val() || {});
+          });
+        } catch (error) {
+          console.error('Firebase init failed', error);
+        }
+      }
 
       loadSelectedDay();
-      ensureWeekSchedule();
-      refreshUI();
-      setInterval(refreshUI, 30000);
+      bindEvents();
+      updateAdminUI();
+      fillAdminForm();
+      initDatabase();
+      startPresence();
+      refreshViews();
+      setInterval(refreshViews, 30000);
     </script>
   </body>
 </html>
