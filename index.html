@@ -1,0 +1,711 @@
+<!DOCTYPE html>
+<html lang="uk">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Outland</title>
+    <style>
+      :root {
+        --yellow: #f5d000;
+        --yellow-strong: #ffd400;
+        --yellow-soft: #ffe97a;
+        --dark: #111111;
+        --bg: #f3f1ec;
+        --panel: #ffffff;
+        --line: rgba(17, 17, 17, 0.1);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html {
+        scroll-behavior: smooth;
+      }
+
+      body {
+        margin: 0;
+        font-family: "Segoe UI", Arial, sans-serif;
+        background: var(--bg);
+        color: var(--dark);
+      }
+
+      a {
+        color: inherit;
+        text-decoration: none;
+      }
+
+      .page {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 24px 20px 60px;
+      }
+
+      .topbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 20px;
+        border-bottom: 2px solid var(--line);
+        padding-bottom: 18px;
+        margin-bottom: 28px;
+      }
+
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+      }
+
+      .logo-wrap {
+        width: 60px;
+        height: 60px;
+        position: relative;
+        display: grid;
+        place-items: center;
+        background: var(--yellow);
+        border: 3px solid var(--dark);
+        transform: rotate(45deg);
+        box-shadow: 6px 6px 0 var(--dark);
+      }
+
+      .logo-text {
+        transform: rotate(-45deg);
+        font-weight: 900;
+        font-size: 1.7rem;
+        letter-spacing: 0.04em;
+      }
+
+      .title-block {
+        display: flex;
+        flex-direction: column;
+      }
+
+      .title {
+        font-size: clamp(2.1rem, 4vw, 3.4rem);
+        line-height: 1;
+        font-weight: 900;
+        letter-spacing: 0.08em;
+        text-transform: none;
+      }
+
+      .subtitle {
+        font-size: 1rem;
+        font-weight: 700;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+        opacity: 0.8;
+      }
+
+      .tabs {
+        display: inline-flex;
+        gap: 12px;
+        background: rgba(17, 17, 17, 0.04);
+        border: 2px solid var(--dark);
+        padding: 8px;
+        border-radius: 18px;
+      }
+
+      .tab {
+        border: 2px solid transparent;
+        background: transparent;
+        color: var(--dark);
+        font-weight: 800;
+        font-size: 1.05rem;
+        border-radius: 12px;
+        padding: 12px 18px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+      }
+
+      .tab.active {
+        background: var(--yellow);
+        border-color: var(--dark);
+        box-shadow: 4px 4px 0 var(--dark);
+      }
+
+      .day-switcher {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin: 14px 0 22px;
+      }
+
+      .day-btn {
+        border: 2px solid var(--dark);
+        background: #fff;
+        color: var(--dark);
+        font-weight: 800;
+        font-size: 0.9rem;
+        padding: 10px 14px;
+        border-radius: 12px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+      }
+
+      .empty-state {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 220px;
+        border: 3px solid var(--dark);
+        border-radius: 18px;
+        background: rgba(255,255,255,0.7);
+        box-shadow: 8px 8px 0 var(--dark);
+        text-align: center;
+        font-size: clamp(1.4rem, 2vw, 2.1rem);
+        font-weight: 900;
+        padding: 30px 20px;
+      }
+
+      .day-btn.active {
+        background: var(--yellow);
+        box-shadow: 4px 4px 0 var(--dark);
+      }
+
+      .panel {
+        display: none;
+      }
+
+      .panel.active {
+        display: block;
+      }
+
+      .subject-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(180px, 1fr));
+        gap: 22px;
+        margin-top: 14px;
+      }
+
+      .subject-btn {
+        position: relative;
+        min-height: 170px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        padding: 26px 18px;
+        background: var(--yellow);
+        color: var(--dark);
+        border: 3px solid var(--dark);
+        box-shadow: 8px 8px 0 var(--dark);
+        font-weight: 900;
+        font-size: clamp(1.1rem, 2vw, 2rem);
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        transition: transform 0.2s ease, background 0.25s ease, box-shadow 0.2s ease, opacity 0.2s ease, filter 0.2s ease;
+      }
+
+      .subject-btn:hover {
+        background: var(--yellow-soft);
+        transform: translate(-2px, -2px);
+        box-shadow: 12px 12px 0 var(--dark);
+      }
+
+      .subject-btn:active {
+        transform: translate(4px, 4px);
+        box-shadow: 4px 4px 0 var(--dark);
+      }
+
+      .subject-btn.past {
+        background: #d8d8d8;
+        color: #4f4f4f;
+        border-color: #6d6d6d;
+        box-shadow: 6px 6px 0 rgba(0, 0, 0, 0.35);
+        opacity: 0.7;
+        filter: grayscale(0.3);
+      }
+
+      .subject-btn.past:hover {
+        background: #d0d0d0;
+      }
+
+      .subject-number {
+        position: absolute;
+        top: 10px;
+        left: 12px;
+        min-width: 26px;
+        height: 26px;
+        display: grid;
+        place-items: center;
+        border: 2px solid var(--dark);
+        border-radius: 8px;
+        background: rgba(255, 255, 255, 0.7);
+        font-size: 0.75rem;
+        font-weight: 900;
+      }
+
+      .utility-bar {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(220px, 1fr));
+        gap: 18px;
+        margin: 18px 0 26px;
+      }
+
+      .info-card {
+        border: 2px solid var(--dark);
+        border-radius: 18px;
+        background: rgba(255, 255, 255, 0.7);
+        box-shadow: 6px 6px 0 var(--dark);
+        padding: 18px 20px;
+      }
+
+      .info-label {
+        display: block;
+        font-size: 0.74rem;
+        font-weight: 900;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        opacity: 0.7;
+        margin-bottom: 8px;
+      }
+
+      .info-value {
+        font-size: clamp(1.1rem, 2vw, 1.6rem);
+        font-weight: 900;
+        line-height: 1.3;
+      }
+
+      .schedule-wrap {
+        background: rgba(255, 255, 255, 0.5);
+        border: 2px solid var(--dark);
+        border-radius: 18px;
+        overflow: hidden;
+        box-shadow: 8px 8px 0 var(--dark);
+      }
+
+      .schedule-header {
+        padding: 18px 20px;
+        background: var(--yellow);
+        border-bottom: 2px solid var(--dark);
+        font-size: clamp(1.5rem, 2vw, 2.2rem);
+        font-weight: 900;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        background: #fff;
+      }
+
+      thead th {
+        background: #f8f3d0;
+        border: 2px solid var(--dark);
+        padding: 14px 12px;
+        font-size: 1rem;
+        text-transform: uppercase;
+      }
+
+      tbody td {
+        border: 2px solid var(--dark);
+        padding: 14px 12px;
+        text-align: center;
+        font-size: 0.98rem;
+        background: rgba(255, 255, 255, 0.7);
+      }
+
+      tbody td:first-child {
+        text-align: left;
+        font-weight: 800;
+        background: #fffbe3;
+      }
+
+      thead th.today {
+        background: #ffe14d;
+      }
+
+      tbody td.today-cell {
+        background: #fff0a8;
+        font-weight: 900;
+      }
+
+      .footer-note {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 7px;
+        margin-top: 24px;
+        font-weight: 600;
+        font-size: 0.72rem;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: #7a7a7a;
+      }
+
+      .dev-icon {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background: #8a8a8a;
+        display: inline-block;
+        box-shadow: 0 0 0 2px rgba(122, 122, 122, 0.2);
+      }
+
+      @media (max-width: 800px) {
+        .topbar {
+          flex-direction: column;
+          align-items: flex-start;
+        }
+
+        .tabs {
+          width: 100%;
+          justify-content: center;
+        }
+
+        .utility-bar {
+          grid-template-columns: 1fr;
+        }
+
+        .subject-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .subject-btn {
+          min-height: 120px;
+        }
+
+        .schedule-wrap {
+          overflow-x: auto;
+        }
+
+        table {
+          min-width: 760px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="page">
+      <header class="topbar">
+        <div class="brand" aria-label="Логотип Outland">
+          <div class="logo-wrap">
+            <div class="logo-text">O</div>
+          </div>
+          <div class="title-block">
+            <div class="title">Outland</div>
+            <div class="subtitle">10 школа м. Торецьк</div>
+          </div>
+        </div>
+
+        <nav class="tabs" aria-label="Навігація сайту">
+          <button class="tab active" type="button" data-target="subjects-panel">Предмети</button>
+          <button class="tab" type="button" data-target="schedule-panel">Розклад</button>
+        </nav>
+      </header>
+
+      <div class="utility-bar">
+        <div class="info-card">
+          <span class="info-label">Сьогодні</span>
+          <div class="info-value" id="todayLabel">Понеділок</div>
+        </div>
+        <div class="info-card">
+          <span class="info-label">Наступний урок</span>
+          <div class="info-value" id="nextLessonLabel">Завантаження...</div>
+        </div>
+      </div>
+
+      <div class="day-switcher" id="daySwitcher" aria-label="Перемикання днів"></div>
+
+      <main>
+        <section id="subjects-panel" class="panel active" aria-label="Предмети">
+          <div class="subject-grid" id="subjectGrid"></div>
+        </section>
+
+        <section id="schedule-panel" class="panel" aria-label="Розклад">
+          <div class="schedule-wrap">
+            <div class="schedule-header" id="scheduleTitle">Розклад</div>
+            <table>
+              <thead>
+                <tr>
+                  <th>№</th>
+                  <th>Час</th>
+                  <th>Предмет</th>
+                </tr>
+              </thead>
+              <tbody id="scheduleBody"></tbody>
+            </table>
+          </div>
+        </section>
+      </main>
+
+      <div class="footer-note">
+        <span class="dev-icon" aria-hidden="true"></span>
+        <span>By YonoDev / Hlib</span>
+      </div>
+    </div>
+
+    <script>
+      const tabs = document.querySelectorAll('.tab');
+      const panels = document.querySelectorAll('.panel');
+      const dayNames = ['Понеділок', 'Вівторок', 'Середа', 'Четвер', "П'ятниця"];
+      const allSubjects = [
+        { name: 'Українська мова', link: 'https://meet.google.com/hjj-irbi-bfv' },
+        { name: 'Українська література', link: 'https://meet.google.com/hjj-irbi-bfv' },
+        { name: 'Фізика', link: 'https://meet.google.com/hjj-irbi-bfv' },
+        { name: 'Алгебра', link: 'https://meet.google.com/hjj-irbi-bfv' },
+        { name: 'Геометрія', link: 'https://meet.google.com/hjj-irbi-bfv' },
+        { name: 'Зарубіжна література', link: 'https://meet.google.com/hjj-irbi-bfv' },
+        { name: 'Хімія', link: 'https://meet.google.com/hjj-irbi-bfv' },
+        { name: 'Біологія', link: 'https://meet.google.com/hjj-irbi-bfv' },
+        { name: 'Історія України', link: 'https://meet.google.com/hjj-irbi-bfv' },
+        { name: 'Історія Всесвітня', link: 'https://meet.google.com/hjj-irbi-bfv' },
+        { name: 'ОБЖ', link: 'https://meet.google.com/hjj-irbi-bfv' },
+        { name: 'Німецька мова', link: 'https://meet.google.com/hjj-irbi-bfv' },
+        { name: 'Англійська мова', link: 'https://meet.google.com/hjj-irbi-bfv' },
+        { name: 'Громадянська освіта', link: 'https://meet.google.com/hjj-irbi-bfv' },
+        { name: 'Образотворче мистецтво', link: 'https://meet.google.com/hjj-irbi-bfv' },
+        { name: 'Музичне мистецтво', link: 'https://meet.google.com/hjj-irbi-bfv' },
+        { name: 'Праця', link: 'https://meet.google.com/hjj-irbi-bfv' },
+        { name: 'Інформатика', link: 'https://meet.google.com/hjj-irbi-bfv' },
+        { name: 'Фінансова грамотність', link: 'https://meet.google.com/hjj-irbi-bfv' }
+      ];
+
+      const lessonDuration = 30;
+      const breakDuration = 10;
+      const timeSlots = ['8:30', '9:10', '9:50', '10:30', '11:10', '11:50', '12:30', '13:10'];
+      let selectedDay = 'Понеділок';
+      let weekSchedule = {};
+
+      function getKyivParts() {
+        const formatter = new Intl.DateTimeFormat('en-GB', {
+          timeZone: 'Europe/Kyiv',
+          year: 'numeric',
+          month: '2-digit',
+          day: '2-digit',
+          hour: '2-digit',
+          minute: '2-digit',
+          second: '2-digit',
+          hour12: false
+        });
+        const parts = formatter.formatToParts(new Date());
+        const values = {};
+        parts.forEach((part) => {
+          if (part.type !== 'literal') {
+            values[part.type] = part.value;
+          }
+        });
+        return {
+          year: Number(values.year),
+          month: Number(values.month),
+          day: Number(values.day),
+          hour: Number(values.hour),
+          minute: Number(values.minute),
+          second: Number(values.second)
+        };
+      }
+
+      function getCurrentKyivDayName() {
+        const { year, month, day } = getKyivParts();
+        const utcDate = Date.UTC(year, month - 1, day);
+        const jsDate = new Date(utcDate);
+        return dayNames[(jsDate.getUTCDay() + 6) % 7] || 'Понеділок';
+      }
+
+      function getKyivMinutesNow() {
+        const { hour, minute } = getKyivParts();
+        return hour * 60 + minute;
+      }
+
+      function shuffleArray(items) {
+        const arr = [...items];
+        for (let i = arr.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [arr[i], arr[j]] = [arr[j], arr[i]];
+        }
+        return arr;
+      }
+
+      function buildWeekSchedule() {
+        weekSchedule = {};
+
+        dayNames.forEach((day, dayIndex) => {
+          const basePool = shuffleArray(allSubjects);
+          const chosen = [];
+
+          if (dayIndex % 2 === 0) {
+            chosen.push(...basePool.filter((subject) => ['Алгебра', 'Фізика', 'Українська мова', 'Інформатика', 'Біологія'].includes(subject.name)).slice(0, 2));
+          }
+
+          const extra = basePool.filter((subject) => !chosen.some((item) => item.name === subject.name));
+          const picked = [...chosen, ...extra].slice(0, 8);
+
+          while (picked.length < 8) {
+            picked.push(basePool[picked.length % basePool.length]);
+          }
+
+          weekSchedule[day] = picked.slice(0, 8).map((subject, index) => ({
+            number: index + 1,
+            time: timeSlots[index],
+            subject: subject.name,
+            link: subject.link
+          }));
+        });
+      }
+
+      function getTimeMinutes(value) {
+        const [hours, minutes] = value.split(':').map(Number);
+        return hours * 60 + minutes;
+      }
+
+      function getLessonEndTime(startTime) {
+        return getTimeMinutes(startTime) + lessonDuration;
+      }
+
+      function isWeekendNow() {
+        const todayName = getCurrentKyivDayName();
+        return !dayNames.includes(todayName);
+      }
+
+      function renderDayButtons() {
+        const daySwitcher = document.getElementById('daySwitcher');
+        daySwitcher.innerHTML = '';
+
+        if (isWeekendNow()) {
+          daySwitcher.style.display = 'none';
+          return;
+        }
+
+        daySwitcher.style.display = 'flex';
+
+        dayNames.forEach((day) => {
+          const btn = document.createElement('button');
+          btn.type = 'button';
+          btn.className = `day-btn ${selectedDay === day ? 'active' : ''}`;
+          btn.textContent = day;
+          btn.addEventListener('click', () => {
+            selectedDay = day;
+            renderDayButtons();
+            renderSubjects();
+            renderSchedule();
+            updateTodayCard();
+          });
+          daySwitcher.appendChild(btn);
+        });
+      }
+
+      function renderSubjects() {
+        const subjectGrid = document.getElementById('subjectGrid');
+        if (isWeekendNow()) {
+          subjectGrid.innerHTML = '<div class="empty-state">Сьогодні вихідний, відпочивай..</div>';
+          return;
+        }
+
+        const currentDayLessons = weekSchedule[selectedDay] || [];
+        const nowMinutes = getKyivMinutesNow();
+
+        subjectGrid.innerHTML = '';
+
+        currentDayLessons.forEach((lesson) => {
+          const startMinutes = getTimeMinutes(lesson.time);
+          const endMinutes = getLessonEndTime(lesson.time);
+          const link = document.createElement('a');
+          link.href = lesson.link;
+          link.target = '_blank';
+          link.rel = 'noreferrer';
+          link.className = 'subject-btn';
+
+          if (endMinutes <= nowMinutes) {
+            link.classList.add('past');
+          }
+
+          const badge = document.createElement('span');
+          badge.className = 'subject-number';
+          badge.textContent = lesson.number;
+
+          const label = document.createElement('span');
+          label.textContent = lesson.subject;
+
+          link.appendChild(badge);
+          link.appendChild(label);
+          subjectGrid.appendChild(link);
+        });
+      }
+
+      function renderSchedule() {
+        const scheduleBody = document.getElementById('scheduleBody');
+        const scheduleTitle = document.getElementById('scheduleTitle');
+        if (isWeekendNow()) {
+          scheduleTitle.textContent = 'Розклад';
+          scheduleBody.innerHTML = '';
+          return;
+        }
+
+        const lessons = weekSchedule[selectedDay] || [];
+        scheduleTitle.textContent = `Розклад · ${selectedDay}`;
+        scheduleBody.innerHTML = '';
+
+        lessons.forEach((lesson) => {
+          const row = document.createElement('tr');
+          row.innerHTML = `
+            <td>${lesson.number}</td>
+            <td>${lesson.time} - ${formatEndTime(lesson.time)}</td>
+            <td>${lesson.subject}</td>
+          `;
+          scheduleBody.appendChild(row);
+        });
+      }
+
+      function formatEndTime(startTime) {
+        const startMinutes = getTimeMinutes(startTime);
+        const endMinutes = startMinutes + lessonDuration;
+        const hours = Math.floor(endMinutes / 60);
+        const minutes = endMinutes % 60;
+        return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
+      }
+
+      function updateTodayCard() {
+        const todayLabel = document.getElementById('todayLabel');
+        const nextLessonLabel = document.getElementById('nextLessonLabel');
+        const todayName = getCurrentKyivDayName();
+
+        if (isWeekendNow()) {
+          todayLabel.textContent = 'Вихідний';
+          nextLessonLabel.textContent = 'Відпочивай';
+          return;
+        }
+
+        todayLabel.textContent = todayName;
+
+        const todaysLessons = weekSchedule[todayName] || weekSchedule['Понеділок'];
+        const nowMinutes = getKyivMinutesNow();
+        let next = todaysLessons.find((lesson) => getTimeMinutes(lesson.time) <= nowMinutes && nowMinutes < getLessonEndTime(lesson.time));
+
+        if (!next) {
+          next = todaysLessons.find((lesson) => nowMinutes < getTimeMinutes(lesson.time));
+        }
+
+        if (!next && todaysLessons.length) {
+          next = todaysLessons[todaysLessons.length - 1];
+        }
+
+        nextLessonLabel.textContent = next ? `${next.subject} · ${next.time}` : 'Уроків немає';
+      }
+
+      function refreshUI() {
+        const todayName = getCurrentKyivDayName();
+        selectedDay = dayNames.includes(todayName) ? todayName : 'Понеділок';
+        renderDayButtons();
+        renderSubjects();
+        renderSchedule();
+        updateTodayCard();
+      }
+
+      tabs.forEach((tab) => {
+        tab.addEventListener('click', () => {
+          const target = tab.dataset.target;
+          tabs.forEach((item) => item.classList.toggle('active', item === tab));
+          panels.forEach((panel) => {
+            panel.classList.toggle('active', panel.id === target);
+          });
+        });
+      });
+
+      buildWeekSchedule();
+      refreshUI();
+      setInterval(refreshUI, 30000);
+    </script>
+  </body>
+</html>
