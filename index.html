@@ -386,7 +386,7 @@
           </div>
           <div class="title-block">
             <div class="title">Outland</div>
-            <div class="subtitle">9-В</div>
+            <div class="subtitle">10 школа м. Торецьк</div>
           </div>
         </div>
 
@@ -466,6 +466,11 @@
       const lessonDuration = 30;
       const breakDuration = 10;
       const timeSlots = ['8:30', '9:10', '9:50', '10:30', '11:10', '11:50', '12:30', '13:10'];
+      const STORAGE_KEYS = {
+        selectedDay: 'outland.selectedDay',
+        schedule: 'outland.weekSchedule',
+        weekKey: 'outland.weekKey'
+      };
       let selectedDay = 'Понеділок';
       let weekSchedule = {};
 
@@ -509,6 +514,17 @@
         return hour * 60 + minute;
       }
 
+      function getCurrentWeekKey() {
+        const now = new Date();
+        const kyivNow = new Date(now.toLocaleString('en-US', { timeZone: 'Europe/Kyiv' }));
+        const start = new Date(Date.UTC(kyivNow.getFullYear(), 0, 4));
+        const day = (kyivNow.getUTCDay() + 6) % 7;
+        const monday = new Date(Date.UTC(kyivNow.getFullYear(), kyivNow.getUTCMonth(), kyivNow.getUTCDate() - day));
+        const diff = Math.floor((monday - start) / 86400000);
+        const weekNumber = Math.floor(diff / 7) + 1;
+        return `${kyivNow.getUTCFullYear()}-${weekNumber}`;
+      }
+
       function shuffleArray(items) {
         const arr = [...items];
         for (let i = arr.length - 1; i > 0; i--) {
@@ -519,7 +535,7 @@
       }
 
       function buildWeekSchedule() {
-        weekSchedule = {};
+        const newSchedule = {};
 
         dayNames.forEach((day, dayIndex) => {
           const basePool = shuffleArray(allSubjects);
@@ -536,13 +552,45 @@
             picked.push(basePool[picked.length % basePool.length]);
           }
 
-          weekSchedule[day] = picked.slice(0, 8).map((subject, index) => ({
+          newSchedule[day] = picked.slice(0, 8).map((subject, index) => ({
             number: index + 1,
             time: timeSlots[index],
             subject: subject.name,
             link: subject.link
           }));
         });
+
+        return newSchedule;
+      }
+
+      function ensureWeekSchedule() {
+        const weekKey = getCurrentWeekKey();
+        const savedWeekKey = localStorage.getItem(STORAGE_KEYS.weekKey);
+        const savedSchedule = localStorage.getItem(STORAGE_KEYS.schedule);
+
+        if (savedWeekKey === weekKey && savedSchedule) {
+          try {
+            weekSchedule = JSON.parse(savedSchedule);
+            return;
+          } catch (error) {
+            console.warn('Saved schedule invalid, regenerating...', error);
+          }
+        }
+
+        weekSchedule = buildWeekSchedule();
+        localStorage.setItem(STORAGE_KEYS.weekKey, weekKey);
+        localStorage.setItem(STORAGE_KEYS.schedule, JSON.stringify(weekSchedule));
+      }
+
+      function saveSelectedDay() {
+        localStorage.setItem(STORAGE_KEYS.selectedDay, selectedDay);
+      }
+
+      function loadSelectedDay() {
+        const savedDay = localStorage.getItem(STORAGE_KEYS.selectedDay);
+        if (savedDay && dayNames.includes(savedDay)) {
+          selectedDay = savedDay;
+        }
       }
 
       function getTimeMinutes(value) {
@@ -577,6 +625,7 @@
           btn.textContent = day;
           btn.addEventListener('click', () => {
             selectedDay = day;
+            saveSelectedDay();
             renderDayButtons();
             renderSubjects();
             renderSchedule();
@@ -669,16 +718,17 @@
 
         todayLabel.textContent = todayName;
 
-        const todaysLessons = weekSchedule[todayName] || weekSchedule['Понеділок'];
+        const targetDay = selectedDay || todayName;
+        const targetLessons = weekSchedule[targetDay] || weekSchedule['Понеділок'];
         const nowMinutes = getKyivMinutesNow();
-        let next = todaysLessons.find((lesson) => getTimeMinutes(lesson.time) <= nowMinutes && nowMinutes < getLessonEndTime(lesson.time));
+        let next = targetLessons.find((lesson) => getTimeMinutes(lesson.time) <= nowMinutes && nowMinutes < getLessonEndTime(lesson.time));
 
         if (!next) {
-          next = todaysLessons.find((lesson) => nowMinutes < getTimeMinutes(lesson.time));
+          next = targetLessons.find((lesson) => nowMinutes < getTimeMinutes(lesson.time));
         }
 
-        if (!next && todaysLessons.length) {
-          next = todaysLessons[todaysLessons.length - 1];
+        if (!next && targetLessons.length) {
+          next = targetLessons[targetLessons.length - 1];
         }
 
         nextLessonLabel.textContent = next ? `${next.subject} · ${next.time}` : 'Уроків немає';
@@ -686,7 +736,12 @@
 
       function refreshUI() {
         const todayName = getCurrentKyivDayName();
-        selectedDay = dayNames.includes(todayName) ? todayName : 'Понеділок';
+
+        if (!dayNames.includes(selectedDay)) {
+          selectedDay = dayNames.includes(todayName) ? todayName : 'Понеділок';
+        }
+
+        saveSelectedDay();
         renderDayButtons();
         renderSubjects();
         renderSchedule();
@@ -703,7 +758,8 @@
         });
       });
 
-      buildWeekSchedule();
+      loadSelectedDay();
+      ensureWeekSchedule();
       refreshUI();
       setInterval(refreshUI, 30000);
     </script>
