@@ -393,8 +393,8 @@
             <div class="logo-text">O</div>
           </div>
           <div class="title-block">
-            <div class="subtitle">9-B</div>
             <div class="title">Outland</div>
+            <div class="subtitle">10 школа м. Торецьк</div>
           </div>
         </div>
 
@@ -450,6 +450,21 @@
       const panels = document.querySelectorAll('.panel');
       const dayNames = ['Понеділок', 'Вівторок', 'Середа', 'Четвер', "П'ятниця"];
       const meetWebLink = 'https://meet.google.com/hjj-irbi-bfv?authuser=0';
+
+      function openMeet(code = 'hjj-irbi-bfv') {
+        const url = `https://meet.google.com/${code}?authuser=0`;
+        const intentUrl = `intent://meet.google.com/${code}#Intent;scheme=https;package=com.google.android.apps.meetings;S.browser_fallback_url=${encodeURIComponent(url)};end`;
+
+        if (/Android/i.test(navigator.userAgent)) {
+          window.location.href = intentUrl;
+          setTimeout(() => {
+            window.location.href = url;
+          }, 1200);
+          return;
+        }
+
+        window.open(url, '_blank', 'noopener,noreferrer');
+      }
 
       const allSubjects = [
         { name: 'Українська мова', link: meetWebLink },
@@ -678,6 +693,10 @@
           link.target = '_blank';
           link.rel = 'noopener noreferrer';
           link.className = 'subject-btn';
+          link.addEventListener('click', (event) => {
+            event.preventDefault();
+            openMeet('hjj-irbi-bfv');
+          });
 
           if (endMinutes <= nowMinutes) {
             link.classList.add('past');
