@@ -369,10 +369,18 @@
 
         .schedule-wrap {
           overflow-x: auto;
+          -webkit-overflow-scrolling: touch;
         }
 
         table {
-          min-width: 760px;
+          min-width: 100%;
+          table-layout: fixed;
+        }
+
+        thead th,
+        tbody td {
+          padding: 10px 8px;
+          font-size: 0.8rem;
         }
       }
     </style>
@@ -385,8 +393,8 @@
             <div class="logo-text">O</div>
           </div>
           <div class="title-block">
+            <div class="subtitle">9-B</div>
             <div class="title">Outland</div>
-            <div class="subtitle">10 школа м. Торецьк</div>
           </div>
         </div>
 
@@ -441,12 +449,7 @@
       const tabs = document.querySelectorAll('.tab');
       const panels = document.querySelectorAll('.panel');
       const dayNames = ['Понеділок', 'Вівторок', 'Середа', 'Четвер', "П'ятниця"];
-      const meetWebLink = 'https://meet.google.com/hjj-irbi-bfv';
-      const meetAndroidDeepLink = 'intent://meet.google.com/hjj-irbi-bfv#Intent;scheme=https;package=com.google.android.apps.meetings;S.browser_fallback_url=https://meet.google.com/hjj-irbi-bfv;end';
-
-      function getMeetLink() {
-        return /Android/i.test(navigator.userAgent) ? meetAndroidDeepLink : meetWebLink;
-      }
+      const meetWebLink = 'https://meet.google.com/hjj-irbi-bfv?authuser=0';
 
       const allSubjects = [
         { name: 'Українська мова', link: meetWebLink },
@@ -533,54 +536,54 @@
 
       const fixedWeekSchedule = {
         'Понеділок': [
-          { number: 1, time: '8:30', subject: 'Українська мова', link: 'https://meet.google.com/hjj-irbi-bfv' },
-          { number: 2, time: '9:10', subject: 'Алгебра', link: 'https://meet.google.com/hjj-irbi-bfv' },
-          { number: 3, time: '9:50', subject: 'Фізика', link: 'https://meet.google.com/hjj-irbi-bfv' },
-          { number: 4, time: '10:30', subject: 'Українська література', link: 'https://meet.google.com/hjj-irbi-bfv' },
-          { number: 5, time: '11:10', subject: 'Інформатика', link: 'https://meet.google.com/hjj-irbi-bfv' },
-          { number: 6, time: '11:50', subject: 'Біологія', link: 'https://meet.google.com/hjj-irbi-bfv' },
-          { number: 7, time: '12:30', subject: 'Англійська мова', link: 'https://meet.google.com/hjj-irbi-bfv' },
-          { number: 8, time: '13:10', subject: 'Історія України', link: 'https://meet.google.com/hjj-irbi-bfv' }
+          { number: 1, time: '8:30', subject: 'Українська мова', link: 'https://meet.google.com/hjj-irbi-bfv?authuser=0' },
+          { number: 2, time: '9:10', subject: 'Алгебра', link: 'https://meet.google.com/hjj-irbi-bfv?authuser=0' },
+          { number: 3, time: '9:50', subject: 'Фізика', link: 'https://meet.google.com/hjj-irbi-bfv?authuser=0' },
+          { number: 4, time: '10:30', subject: 'Українська література', link: 'https://meet.google.com/hjj-irbi-bfv?authuser=0' },
+          { number: 5, time: '11:10', subject: 'Інформатика', link: 'https://meet.google.com/hjj-irbi-bfv?authuser=0' },
+          { number: 6, time: '11:50', subject: 'Біологія', link: 'https://meet.google.com/hjj-irbi-bfv?authuser=0' },
+          { number: 7, time: '12:30', subject: 'Англійська мова', link: 'https://meet.google.com/hjj-irbi-bfv?authuser=0' },
+          { number: 8, time: '13:10', subject: 'Історія України', link: 'https://meet.google.com/hjj-irbi-bfv?authuser=0' }
         ],
         'Вівторок': [
-          { number: 1, time: '8:30', subject: 'Геометрія', link: 'https://meet.google.com/hjj-irbi-bfv' },
-          { number: 2, time: '9:10', subject: 'Українська мова', link: 'https://meet.google.com/hjj-irbi-bfv' },
-          { number: 3, time: '9:50', subject: 'Хімія', link: 'https://meet.google.com/hjj-irbi-bfv' },
-          { number: 4, time: '10:30', subject: 'Зарубіжна література', link: 'https://meet.google.com/hjj-irbi-bfv' },
-          { number: 5, time: '11:10', subject: 'Фізика', link: 'https://meet.google.com/hjj-irbi-bfv' },
-          { number: 6, time: '11:50', subject: 'Англійська мова', link: 'https://meet.google.com/hjj-irbi-bfv' },
-          { number: 7, time: '12:30', subject: 'Біологія', link: 'https://meet.google.com/hjj-irbi-bfv' },
-          { number: 8, time: '13:10', subject: 'Інформатика', link: 'https://meet.google.com/hjj-irbi-bfv' }
+          { number: 1, time: '8:30', subject: 'Геометрія', link: 'https://meet.google.com/hjj-irbi-bfv?authuser=0' },
+          { number: 2, time: '9:10', subject: 'Українська мова', link: 'https://meet.google.com/hjj-irbi-bfv?authuser=0' },
+          { number: 3, time: '9:50', subject: 'Хімія', link: 'https://meet.google.com/hjj-irbi-bfv?authuser=0' },
+          { number: 4, time: '10:30', subject: 'Зарубіжна література', link: 'https://meet.google.com/hjj-irbi-bfv?authuser=0' },
+          { number: 5, time: '11:10', subject: 'Фізика', link: 'https://meet.google.com/hjj-irbi-bfv?authuser=0' },
+          { number: 6, time: '11:50', subject: 'Англійська мова', link: 'https://meet.google.com/hjj-irbi-bfv?authuser=0' },
+          { number: 7, time: '12:30', subject: 'Біологія', link: 'https://meet.google.com/hjj-irbi-bfv?authuser=0' },
+          { number: 8, time: '13:10', subject: 'Інформатика', link: 'https://meet.google.com/hjj-irbi-bfv?authuser=0' }
         ],
         'Середа': [
-          { number: 1, time: '8:30', subject: 'Фізика', link: 'https://meet.google.com/hjj-irbi-bfv' },
-          { number: 2, time: '9:10', subject: 'Українська література', link: 'https://meet.google.com/hjj-irbi-bfv' },
-          { number: 3, time: '9:50', subject: 'Алгебра', link: 'https://meet.google.com/hjj-irbi-bfv' },
-          { number: 4, time: '10:30', subject: 'Геометрія', link: 'https://meet.google.com/hjj-irbi-bfv' },
-          { number: 5, time: '11:10', subject: 'Історія України', link: 'https://meet.google.com/hjj-irbi-bfv' },
-          { number: 6, time: '11:50', subject: 'Англійська мова', link: 'https://meet.google.com/hjj-irbi-bfv' },
-          { number: 7, time: '12:30', subject: 'Хімія', link: 'https://meet.google.com/hjj-irbi-bfv' },
-          { number: 8, time: '13:10', subject: 'Інформатика', link: 'https://meet.google.com/hjj-irbi-bfv' }
+          { number: 1, time: '8:30', subject: 'Фізика', link: 'https://meet.google.com/hjj-irbi-bfv?authuser=0' },
+          { number: 2, time: '9:10', subject: 'Українська література', link: 'https://meet.google.com/hjj-irbi-bfv?authuser=0' },
+          { number: 3, time: '9:50', subject: 'Алгебра', link: 'https://meet.google.com/hjj-irbi-bfv?authuser=0' },
+          { number: 4, time: '10:30', subject: 'Геометрія', link: 'https://meet.google.com/hjj-irbi-bfv?authuser=0' },
+          { number: 5, time: '11:10', subject: 'Історія України', link: 'https://meet.google.com/hjj-irbi-bfv?authuser=0' },
+          { number: 6, time: '11:50', subject: 'Англійська мова', link: 'https://meet.google.com/hjj-irbi-bfv?authuser=0' },
+          { number: 7, time: '12:30', subject: 'Хімія', link: 'https://meet.google.com/hjj-irbi-bfv?authuser=0' },
+          { number: 8, time: '13:10', subject: 'Інформатика', link: 'https://meet.google.com/hjj-irbi-bfv?authuser=0' }
         ],
         'Четвер': [
-          { number: 1, time: '8:30', subject: 'Українська мова', link: 'https://meet.google.com/hjj-irbi-bfv' },
-          { number: 2, time: '9:10', subject: 'Біологія', link: 'https://meet.google.com/hjj-irbi-bfv' },
-          { number: 3, time: '9:50', subject: 'Геометрія', link: 'https://meet.google.com/hjj-irbi-bfv' },
-          { number: 4, time: '10:30', subject: 'Фізика', link: 'https://meet.google.com/hjj-irbi-bfv' },
-          { number: 5, time: '11:10', subject: 'Англійська мова', link: 'https://meet.google.com/hjj-irbi-bfv' },
-          { number: 6, time: '11:50', subject: 'Історія Всесвітня', link: 'https://meet.google.com/hjj-irbi-bfv' },
-          { number: 7, time: '12:30', subject: 'Інформатика', link: 'https://meet.google.com/hjj-irbi-bfv' },
-          { number: 8, time: '13:10', subject: 'Українська література', link: 'https://meet.google.com/hjj-irbi-bfv' }
+          { number: 1, time: '8:30', subject: 'Українська мова', link: 'https://meet.google.com/hjj-irbi-bfv?authuser=0' },
+          { number: 2, time: '9:10', subject: 'Біологія', link: 'https://meet.google.com/hjj-irbi-bfv?authuser=0' },
+          { number: 3, time: '9:50', subject: 'Геометрія', link: 'https://meet.google.com/hjj-irbi-bfv?authuser=0' },
+          { number: 4, time: '10:30', subject: 'Фізика', link: 'https://meet.google.com/hjj-irbi-bfv?authuser=0' },
+          { number: 5, time: '11:10', subject: 'Англійська мова', link: 'https://meet.google.com/hjj-irbi-bfv?authuser=0' },
+          { number: 6, time: '11:50', subject: 'Історія Всесвітня', link: 'https://meet.google.com/hjj-irbi-bfv?authuser=0' },
+          { number: 7, time: '12:30', subject: 'Інформатика', link: 'https://meet.google.com/hjj-irbi-bfv?authuser=0' },
+          { number: 8, time: '13:10', subject: 'Українська література', link: 'https://meet.google.com/hjj-irbi-bfv?authuser=0' }
         ],
         "П'ятниця": [
-          { number: 1, time: '8:30', subject: 'Алгебра', link: 'https://meet.google.com/hjj-irbi-bfv' },
-          { number: 2, time: '9:10', subject: 'Геометрія', link: 'https://meet.google.com/hjj-irbi-bfv' },
-          { number: 3, time: '9:50', subject: 'Хімія', link: 'https://meet.google.com/hjj-irbi-bfv' },
-          { number: 4, time: '10:30', subject: 'Історія України', link: 'https://meet.google.com/hjj-irbi-bfv' },
-          { number: 5, time: '11:10', subject: 'Фізика', link: 'https://meet.google.com/hjj-irbi-bfv' },
-          { number: 6, time: '11:50', subject: 'Біологія', link: 'https://meet.google.com/hjj-irbi-bfv' },
-          { number: 7, time: '12:30', subject: 'Англійська мова', link: 'https://meet.google.com/hjj-irbi-bfv' },
-          { number: 8, time: '13:10', subject: 'Українська мова', link: 'https://meet.google.com/hjj-irbi-bfv' }
+          { number: 1, time: '8:30', subject: 'Алгебра', link: 'https://meet.google.com/hjj-irbi-bfv?authuser=0' },
+          { number: 2, time: '9:10', subject: 'Геометрія', link: 'https://meet.google.com/hjj-irbi-bfv?authuser=0' },
+          { number: 3, time: '9:50', subject: 'Хімія', link: 'https://meet.google.com/hjj-irbi-bfv?authuser=0' },
+          { number: 4, time: '10:30', subject: 'Історія України', link: 'https://meet.google.com/hjj-irbi-bfv?authuser=0' },
+          { number: 5, time: '11:10', subject: 'Фізика', link: 'https://meet.google.com/hjj-irbi-bfv?authuser=0' },
+          { number: 6, time: '11:50', subject: 'Біологія', link: 'https://meet.google.com/hjj-irbi-bfv?authuser=0' },
+          { number: 7, time: '12:30', subject: 'Англійська мова', link: 'https://meet.google.com/hjj-irbi-bfv?authuser=0' },
+          { number: 8, time: '13:10', subject: 'Українська мова', link: 'https://meet.google.com/hjj-irbi-bfv?authuser=0' }
         ]
       };
 
@@ -671,12 +674,9 @@
           const startMinutes = getTimeMinutes(lesson.time);
           const endMinutes = getLessonEndTime(lesson.time);
           const link = document.createElement('a');
-          link.href = lesson.link || getMeetLink();
-          link.target = '_self';
+          link.href = lesson.link || meetWebLink;
+          link.target = '_blank';
           link.rel = 'noopener noreferrer';
-          if (/Android/i.test(navigator.userAgent)) {
-            link.href = getMeetLink();
-          }
           link.className = 'subject-btn';
 
           if (endMinutes <= nowMinutes) {
