@@ -386,7 +386,7 @@
           </div>
           <div class="title-block">
             <div class="title">Outland</div>
-            <div class="subtitle">9-В</div>
+            <div class="subtitle">10 школа м. Торецьк</div>
           </div>
         </div>
 
@@ -441,26 +441,33 @@
       const tabs = document.querySelectorAll('.tab');
       const panels = document.querySelectorAll('.panel');
       const dayNames = ['Понеділок', 'Вівторок', 'Середа', 'Четвер', "П'ятниця"];
+      const meetWebLink = 'https://meet.google.com/hjj-irbi-bfv';
+      const meetAndroidDeepLink = 'intent://meet.google.com/hjj-irbi-bfv#Intent;scheme=https;package=com.google.android.apps.meetings;S.browser_fallback_url=https://meet.google.com/hjj-irbi-bfv;end';
+
+      function getMeetLink() {
+        return /Android/i.test(navigator.userAgent) ? meetAndroidDeepLink : meetWebLink;
+      }
+
       const allSubjects = [
-        { name: 'Українська мова', link: 'https://meet.google.com/hjj-irbi-bfv' },
-        { name: 'Українська література', link: 'https://meet.google.com/hjj-irbi-bfv' },
-        { name: 'Фізика', link: 'https://meet.google.com/hjj-irbi-bfv' },
-        { name: 'Алгебра', link: 'https://meet.google.com/hjj-irbi-bfv' },
-        { name: 'Геометрія', link: 'https://meet.google.com/hjj-irbi-bfv' },
-        { name: 'Зарубіжна література', link: 'https://meet.google.com/hjj-irbi-bfv' },
-        { name: 'Хімія', link: 'https://meet.google.com/hjj-irbi-bfv' },
-        { name: 'Біологія', link: 'https://meet.google.com/hjj-irbi-bfv' },
-        { name: 'Історія України', link: 'https://meet.google.com/hjj-irbi-bfv' },
-        { name: 'Історія Всесвітня', link: 'https://meet.google.com/hjj-irbi-bfv' },
-        { name: 'ОБЖ', link: 'https://meet.google.com/hjj-irbi-bfv' },
-        { name: 'Німецька мова', link: 'https://meet.google.com/hjj-irbi-bfv' },
-        { name: 'Англійська мова', link: 'https://meet.google.com/hjj-irbi-bfv' },
-        { name: 'Громадянська освіта', link: 'https://meet.google.com/hjj-irbi-bfv' },
-        { name: 'Образотворче мистецтво', link: 'https://meet.google.com/hjj-irbi-bfv' },
-        { name: 'Музичне мистецтво', link: 'https://meet.google.com/hjj-irbi-bfv' },
-        { name: 'Праця', link: 'https://meet.google.com/hjj-irbi-bfv' },
-        { name: 'Інформатика', link: 'https://meet.google.com/hjj-irbi-bfv' },
-        { name: 'Фінансова грамотність', link: 'https://meet.google.com/hjj-irbi-bfv' }
+        { name: 'Українська мова', link: meetWebLink },
+        { name: 'Українська література', link: meetWebLink },
+        { name: 'Фізика', link: meetWebLink },
+        { name: 'Алгебра', link: meetWebLink },
+        { name: 'Геометрія', link: meetWebLink },
+        { name: 'Зарубіжна література', link: meetWebLink },
+        { name: 'Хімія', link: meetWebLink },
+        { name: 'Біологія', link: meetWebLink },
+        { name: 'Історія України', link: meetWebLink },
+        { name: 'Історія Всесвітня', link: meetWebLink },
+        { name: 'ОБЖ', link: meetWebLink },
+        { name: 'Німецька мова', link: meetWebLink },
+        { name: 'Англійська мова', link: meetWebLink },
+        { name: 'Громадянська освіта', link: meetWebLink },
+        { name: 'Образотворче мистецтво', link: meetWebLink },
+        { name: 'Музичне мистецтво', link: meetWebLink },
+        { name: 'Праця', link: meetWebLink },
+        { name: 'Інформатика', link: meetWebLink },
+        { name: 'Фінансова грамотність', link: meetWebLink }
       ];
 
       const lessonDuration = 30;
@@ -664,9 +671,12 @@
           const startMinutes = getTimeMinutes(lesson.time);
           const endMinutes = getLessonEndTime(lesson.time);
           const link = document.createElement('a');
-          link.href = lesson.link;
-          link.target = '_blank';
-          link.rel = 'noreferrer';
+          link.href = lesson.link || getMeetLink();
+          link.target = '_self';
+          link.rel = 'noopener noreferrer';
+          if (/Android/i.test(navigator.userAgent)) {
+            link.href = getMeetLink();
+          }
           link.className = 'subject-btn';
 
           if (endMinutes <= nowMinutes) {
@@ -725,7 +735,7 @@
 
         if (isWeekendNow()) {
           todayLabel.textContent = 'Вихідний';
-          nextLessonLabel.textContent = 'Відпочивай';
+          nextLessonLabel.textContent = '☕ Відпочивай';
           return;
         }
 
@@ -734,17 +744,43 @@
         const targetDay = selectedDay || todayName;
         const targetLessons = weekSchedule[targetDay] || weekSchedule['Понеділок'];
         const nowMinutes = getKyivMinutesNow();
-        let next = targetLessons.find((lesson) => getTimeMinutes(lesson.time) <= nowMinutes && nowMinutes < getLessonEndTime(lesson.time));
 
-        if (!next) {
-          next = targetLessons.find((lesson) => nowMinutes < getTimeMinutes(lesson.time));
+        const activeLesson = targetLessons.find((lesson) => {
+          const start = getTimeMinutes(lesson.time);
+          const end = getLessonEndTime(lesson.time);
+          return start <= nowMinutes && nowMinutes < end;
+        });
+
+        if (activeLesson) {
+          const endTime = formatEndTime(activeLesson.time);
+          nextLessonLabel.textContent = `🕒 ${activeLesson.subject} ${activeLesson.time} - ${endTime}`;
+          return;
         }
 
-        if (!next && targetLessons.length) {
-          next = targetLessons[targetLessons.length - 1];
+        for (let i = 0; i < targetLessons.length; i++) {
+          const lesson = targetLessons[i];
+          const lessonEnd = getLessonEndTime(lesson.time);
+          const hasNext = i + 1 < targetLessons.length;
+          const nextStart = hasNext ? getTimeMinutes(targetLessons[i + 1].time) : null;
+
+          if (nowMinutes >= lessonEnd && nextStart !== null && nowMinutes < nextStart) {
+            nextLessonLabel.textContent = '☕ Перерва';
+            return;
+          }
         }
 
-        nextLessonLabel.textContent = next ? `${next.subject} · ${next.time}` : 'Уроків немає';
+        const lastLesson = targetLessons[targetLessons.length - 1];
+        const lastLessonEnd = lastLesson ? getLessonEndTime(lastLesson.time) : 0;
+
+        if (lastLessonEnd <= nowMinutes || nowMinutes < getTimeMinutes(targetLessons[0].time)) {
+          nextLessonLabel.textContent = '✕ Немає уроків';
+          return;
+        }
+
+        const nextLesson = targetLessons.find((lesson) => nowMinutes < getTimeMinutes(lesson.time));
+        nextLessonLabel.textContent = nextLesson
+          ? `🕒 ${nextLesson.subject} ${nextLesson.time}`
+          : '✕ Немає уроків';
       }
 
       function refreshUI() {
