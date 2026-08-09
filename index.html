@@ -386,7 +386,7 @@
           </div>
           <div class="title-block">
             <div class="title">Outland</div>
-            <div class="subtitle">10 школа м. Торецьк</div>
+            <div class="subtitle">9-В</div>
           </div>
         </div>
 
@@ -468,8 +468,7 @@
       const timeSlots = ['8:30', '9:10', '9:50', '10:30', '11:10', '11:50', '12:30', '13:10'];
       const STORAGE_KEYS = {
         selectedDay: 'outland.selectedDay',
-        schedule: 'outland.weekSchedule',
-        weekKey: 'outland.weekKey'
+        schedule: 'outland.weekSchedule'
       };
       let selectedDay = 'Понеділок';
       let weekSchedule = {};
@@ -591,19 +590,9 @@
       }
 
       function ensureWeekSchedule() {
-        const savedSchedule = localStorage.getItem(STORAGE_KEYS.schedule);
-
-        if (savedSchedule) {
-          try {
-            weekSchedule = JSON.parse(savedSchedule);
-            return;
-          } catch (error) {
-            console.warn('Saved schedule invalid, resetting to fixed schedule...', error);
-          }
-        }
-
-        weekSchedule = buildWeekSchedule();
-        localStorage.setItem(STORAGE_KEYS.schedule, JSON.stringify(weekSchedule));
+        const fixedSchedule = buildWeekSchedule();
+        weekSchedule = fixedSchedule;
+        localStorage.setItem(STORAGE_KEYS.schedule, JSON.stringify(fixedSchedule));
       }
 
       function saveSelectedDay() {
