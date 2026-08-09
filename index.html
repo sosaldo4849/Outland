@@ -386,7 +386,7 @@
           </div>
           <div class="title-block">
             <div class="title">Outland</div>
-            <div class="subtitle">9-В</div>
+            <div class="subtitle">10 школа м. Торецьк</div>
           </div>
         </div>
 
@@ -525,59 +525,84 @@
         return `${kyivNow.getUTCFullYear()}-${weekNumber}`;
       }
 
-      function shuffleArray(items) {
-        const arr = [...items];
-        for (let i = arr.length - 1; i > 0; i--) {
-          const j = Math.floor(Math.random() * (i + 1));
-          [arr[i], arr[j]] = [arr[j], arr[i]];
-        }
-        return arr;
-      }
+      const fixedWeekSchedule = {
+        'Понеділок': [
+          { number: 1, time: '8:30', subject: 'Українська мова', link: 'https://meet.google.com/hjj-irbi-bfv' },
+          { number: 2, time: '9:10', subject: 'Алгебра', link: 'https://meet.google.com/hjj-irbi-bfv' },
+          { number: 3, time: '9:50', subject: 'Фізика', link: 'https://meet.google.com/hjj-irbi-bfv' },
+          { number: 4, time: '10:30', subject: 'Українська література', link: 'https://meet.google.com/hjj-irbi-bfv' },
+          { number: 5, time: '11:10', subject: 'Інформатика', link: 'https://meet.google.com/hjj-irbi-bfv' },
+          { number: 6, time: '11:50', subject: 'Біологія', link: 'https://meet.google.com/hjj-irbi-bfv' },
+          { number: 7, time: '12:30', subject: 'Англійська мова', link: 'https://meet.google.com/hjj-irbi-bfv' },
+          { number: 8, time: '13:10', subject: 'Історія України', link: 'https://meet.google.com/hjj-irbi-bfv' }
+        ],
+        'Вівторок': [
+          { number: 1, time: '8:30', subject: 'Геометрія', link: 'https://meet.google.com/hjj-irbi-bfv' },
+          { number: 2, time: '9:10', subject: 'Українська мова', link: 'https://meet.google.com/hjj-irbi-bfv' },
+          { number: 3, time: '9:50', subject: 'Хімія', link: 'https://meet.google.com/hjj-irbi-bfv' },
+          { number: 4, time: '10:30', subject: 'Зарубіжна література', link: 'https://meet.google.com/hjj-irbi-bfv' },
+          { number: 5, time: '11:10', subject: 'Фізика', link: 'https://meet.google.com/hjj-irbi-bfv' },
+          { number: 6, time: '11:50', subject: 'Англійська мова', link: 'https://meet.google.com/hjj-irbi-bfv' },
+          { number: 7, time: '12:30', subject: 'Біологія', link: 'https://meet.google.com/hjj-irbi-bfv' },
+          { number: 8, time: '13:10', subject: 'Інформатика', link: 'https://meet.google.com/hjj-irbi-bfv' }
+        ],
+        'Середа': [
+          { number: 1, time: '8:30', subject: 'Фізика', link: 'https://meet.google.com/hjj-irbi-bfv' },
+          { number: 2, time: '9:10', subject: 'Українська література', link: 'https://meet.google.com/hjj-irbi-bfv' },
+          { number: 3, time: '9:50', subject: 'Алгебра', link: 'https://meet.google.com/hjj-irbi-bfv' },
+          { number: 4, time: '10:30', subject: 'Геометрія', link: 'https://meet.google.com/hjj-irbi-bfv' },
+          { number: 5, time: '11:10', subject: 'Історія України', link: 'https://meet.google.com/hjj-irbi-bfv' },
+          { number: 6, time: '11:50', subject: 'Англійська мова', link: 'https://meet.google.com/hjj-irbi-bfv' },
+          { number: 7, time: '12:30', subject: 'Хімія', link: 'https://meet.google.com/hjj-irbi-bfv' },
+          { number: 8, time: '13:10', subject: 'Інформатика', link: 'https://meet.google.com/hjj-irbi-bfv' }
+        ],
+        'Четвер': [
+          { number: 1, time: '8:30', subject: 'Українська мова', link: 'https://meet.google.com/hjj-irbi-bfv' },
+          { number: 2, time: '9:10', subject: 'Біологія', link: 'https://meet.google.com/hjj-irbi-bfv' },
+          { number: 3, time: '9:50', subject: 'Геометрія', link: 'https://meet.google.com/hjj-irbi-bfv' },
+          { number: 4, time: '10:30', subject: 'Фізика', link: 'https://meet.google.com/hjj-irbi-bfv' },
+          { number: 5, time: '11:10', subject: 'Англійська мова', link: 'https://meet.google.com/hjj-irbi-bfv' },
+          { number: 6, time: '11:50', subject: 'Історія Всесвітня', link: 'https://meet.google.com/hjj-irbi-bfv' },
+          { number: 7, time: '12:30', subject: 'Інформатика', link: 'https://meet.google.com/hjj-irbi-bfv' },
+          { number: 8, time: '13:10', subject: 'Українська література', link: 'https://meet.google.com/hjj-irbi-bfv' }
+        ],
+        "П'ятниця": [
+          { number: 1, time: '8:30', subject: 'Алгебра', link: 'https://meet.google.com/hjj-irbi-bfv' },
+          { number: 2, time: '9:10', subject: 'Геометрія', link: 'https://meet.google.com/hjj-irbi-bfv' },
+          { number: 3, time: '9:50', subject: 'Хімія', link: 'https://meet.google.com/hjj-irbi-bfv' },
+          { number: 4, time: '10:30', subject: 'Історія України', link: 'https://meet.google.com/hjj-irbi-bfv' },
+          { number: 5, time: '11:10', subject: 'Фізика', link: 'https://meet.google.com/hjj-irbi-bfv' },
+          { number: 6, time: '11:50', subject: 'Біологія', link: 'https://meet.google.com/hjj-irbi-bfv' },
+          { number: 7, time: '12:30', subject: 'Англійська мова', link: 'https://meet.google.com/hjj-irbi-bfv' },
+          { number: 8, time: '13:10', subject: 'Українська мова', link: 'https://meet.google.com/hjj-irbi-bfv' }
+        ]
+      };
 
       function buildWeekSchedule() {
-        const fixedPlan = [
-          ['Українська мова', 'Алгебра', 'Фізика', 'Українська література', 'Інформатика', 'Біологія', 'Англійська мова', 'Історія України'],
-          ['Геометрія', 'Українська мова', 'Хімія', 'Зарубіжна література', 'Фізика', 'Англійська мова', 'Біологія', 'Інформатика'],
-          ['Фізика', 'Українська література', 'Алгебра', 'Геометрія', 'Історія України', 'Англійська мова', 'Хімія', 'Інформатика'],
-          ['Українська мова', 'Біологія', 'Геометрія', 'Фізика', 'Англійська мова', 'Історія Всесвітня', 'Інформатика', 'Українська література'],
-          ['Алгебра', 'Геометрія', 'Хімія', 'Історія України', 'Фізика', 'Біологія', 'Англійська мова', 'Українська мова']
-        ];
-
         const newSchedule = {};
 
-        dayNames.forEach((day, dayIndex) => {
-          const dayLessons = fixedPlan[dayIndex] || fixedPlan[0];
-
-          newSchedule[day] = dayLessons.map((subjectName, index) => {
-            const subject = allSubjects.find((item) => item.name === subjectName) || allSubjects[0];
-            return {
-              number: index + 1,
-              time: timeSlots[index],
-              subject: subjectName,
-              link: subject.link
-            };
-          });
+        dayNames.forEach((day) => {
+          newSchedule[day] = (fixedWeekSchedule[day] || fixedWeekSchedule['Понеділок']).map((lesson) => ({
+            ...lesson
+          }));
         });
 
         return newSchedule;
       }
 
       function ensureWeekSchedule() {
-        const weekKey = getCurrentWeekKey();
-        const savedWeekKey = localStorage.getItem(STORAGE_KEYS.weekKey);
         const savedSchedule = localStorage.getItem(STORAGE_KEYS.schedule);
 
-        if (savedWeekKey === weekKey && savedSchedule) {
+        if (savedSchedule) {
           try {
             weekSchedule = JSON.parse(savedSchedule);
             return;
           } catch (error) {
-            console.warn('Saved schedule invalid, regenerating...', error);
+            console.warn('Saved schedule invalid, resetting to fixed schedule...', error);
           }
         }
 
         weekSchedule = buildWeekSchedule();
-        localStorage.setItem(STORAGE_KEYS.weekKey, weekKey);
         localStorage.setItem(STORAGE_KEYS.schedule, JSON.stringify(weekSchedule));
       }
 
