@@ -464,6 +464,62 @@
         box-shadow: 0 0 0 2px rgba(122, 122, 122, 0.2);
       }
 
+      .desktop-mode-warning {
+        position: fixed;
+        inset: 0;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        background: rgba(0, 0, 0, 0.8);
+        z-index: 2000;
+        padding: 20px;
+      }
+
+      .desktop-mode-warning.show {
+        display: flex;
+      }
+
+      .desktop-mode-content {
+        background: #fff;
+        border: 3px solid var(--dark);
+        border-radius: 28px;
+        padding: 40px 30px;
+        max-width: 480px;
+        text-align: center;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
+      }
+
+      .warning-icon {
+        width: 80px;
+        height: 80px;
+        margin: 0 auto 20px;
+        background: #ffd400;
+        border: 3px solid var(--dark);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 3rem;
+        box-shadow: 6px 6px 0 var(--dark);
+      }
+
+      .desktop-mode-content h2 {
+        margin: 0 0 12px;
+        font-size: 1.6rem;
+        font-weight: 900;
+        letter-spacing: 0.04em;
+        color: var(--dark);
+      }
+
+      .desktop-mode-content p {
+        margin: 0;
+        font-size: 1.1rem;
+        font-weight: 700;
+        letter-spacing: 0.02em;
+        color: #4a4a4a;
+        line-height: 1.5;
+      }
+
       @media (max-width: 800px) {
         .topbar {
           flex-direction: column;
@@ -603,6 +659,14 @@
       <ul id="deviceList" class="device-list"></ul>
     </aside>
 
+    <div id="desktopModeWarning" class="desktop-mode-warning">
+      <div class="desktop-mode-content">
+        <div class="warning-icon">⚠️</div>
+        <h2>Увага</h2>
+        <p>Увімкніть "версію для ПК" у меню браузера для правильної роботи сервісу.</p>
+      </div>
+    </div>
+
     <script type="module">
       import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
       import {
@@ -703,6 +767,41 @@
       function clone(value) {
         return JSON.parse(JSON.stringify(value));
       }
+
+      function isMobileDevice() {
+        return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+      }
+
+      let desktopWarningShown = false;
+
+      function checkDesktopMode() {
+        const warning = document.getElementById('desktopModeWarning');
+        const isMobile = isMobileDevice();
+        const isNarrow = window.innerWidth < 1024;
+        
+        // Если мобильное устройство И окно узко - показываем уведомление
+        if (isMobile && isNarrow) {
+          warning.classList.add('show');
+          desktopWarningShown = true;
+        } 
+        // Если было показано уведомление, но теперь окно расширилось - обновляем
+        else if (desktopWarningShown && !isNarrow) {
+          warning.classList.remove('show');
+          desktopWarningShown = false;
+          setTimeout(() => location.reload(), 300);
+        } 
+        // Иначе - скрываем уведомление
+        else {
+          warning.classList.remove('show');
+          desktopWarningShown = false;
+        }
+      }
+
+      // Слушаем изменения размера окна
+      window.addEventListener('resize', checkDesktopMode);
+      window.addEventListener('orientationchange', () => {
+        setTimeout(checkDesktopMode, 100);
+      });
 
       function openMeet(code = 'hjj-irbi-bfv') {
         const url = `https://meet.google.com/${code}`;
@@ -1115,6 +1214,7 @@
       bindEvents();
       updateAdminUI();
       fillAdminForm();
+      checkDesktopMode();
       initDatabase();
       startPresence();
       refreshViews();
