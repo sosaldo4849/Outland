@@ -1628,7 +1628,7 @@
       async function resetAdminChanges() {
         siteState = {
           pageTitle: 'Outland',
-          subtitle: '10 школа м. Торецьк',
+          subtitle: '9-Г',
           schedule: clone(defaultSchedule),
           updatedAt: Date.now()
         };
@@ -1743,7 +1743,7 @@
             const data = snapshot.val();
             siteState = {
               pageTitle: data.pageTitle || 'Outland',
-              subtitle: data.subtitle || '10 школа м. Торецьк',
+              subtitle: data.subtitle || '9-Г',
               schedule: data.schedule && Object.keys(data.schedule).length ? data.schedule : clone(defaultSchedule)
             };
           } else {
