@@ -1222,7 +1222,7 @@
       let isAdmin = localStorage.getItem(STORAGE_KEYS.adminMode) === '1';
       let siteState = {
         pageTitle: 'Outland',
-        subtitle: '10 школа м. Торецьк',
+        subtitle: '9-Г',
         schedule: JSON.parse(JSON.stringify(defaultSchedule))
       };
 
@@ -1616,7 +1616,7 @@
 
         const nextState = {
           pageTitle: document.getElementById('adminTitleInput').value.trim() || 'Outland',
-          subtitle: document.getElementById('adminSubtitleInput').value.trim() || '10 школа м. Торецьк',
+          subtitle: document.getElementById('adminSubtitleInput').value.trim() || '9-Г',
           schedule,
           updatedAt: Date.now()
         };
