@@ -705,17 +705,17 @@
       }
 
       function openMeet(code = 'hjj-irbi-bfv') {
-        const url = `https://meet.google.com/${code}?authuser=0`;
-        const intentUrl = `intent://meet.google.com/${code}#Intent;scheme=https;package=com.google.android.apps.meetings;S.browser_fallback_url=${encodeURIComponent(url)};end`;
-
+        const url = `https://meet.google.com/${code}`;
+        
         if (/Android/i.test(navigator.userAgent)) {
+          // Правильний Intent URI з fallback URL для Android
+          const fallbackUrl = encodeURIComponent(url);
+          const intentUrl = `intent://meet.google.com/${code}#Intent;scheme=https;package=com.google.android.apps.meetings;S.browser_fallback_url=${fallbackUrl};end`;
           window.location.href = intentUrl;
-          setTimeout(() => {
-            window.location.href = url;
-          }, 1200);
           return;
         }
 
+        // Для iOS та десктопу
         window.open(url, '_blank', 'noopener,noreferrer');
       }
 
